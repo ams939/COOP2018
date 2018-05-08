@@ -2,17 +2,15 @@ import idigbio
 import TableSchemaCreator
 from DBInfo import connectDB
 
-'''
-    Program that populates database table called (that contains needed fields
-    which are created by TableSchemaCreator.py) with data from an idigbio query
+'''Program that populates already existing database table in a PostgreSQL DB
+   with data from an idigbio query
 '''
 
 
-'''
-    Function that takes idigbio query in dictionary format and inputs data contained
-    within it into a database "testdb" table defined by user
-'''
 def createTable(result, table_name):
+    '''Function that takes idigbio query in dictionary format and inputs data contained
+    within it into a database "testdb" table defined by user
+    '''
     #Connect to database, db name is testdb
     connection = connectDB()
     #Initialize cursor
@@ -36,7 +34,7 @@ def createTable(result, table_name):
             #Data key, same as database field name
             key = keys_values[i][0]
             
-            #Unstandardized data value
+            #Unstandardized data value, converted to string
             raw_value = str(keys_values[i][1])
             
             #Standardize value data by replacing single quotes with doubles (to avoid mismatching quotes)
@@ -80,10 +78,9 @@ def createTable(result, table_name):
     connection.close()
         
 
-'''
-    Main function for testing purposes only
-'''
 def main():
+    '''Main function for testing purposes only
+    '''
     #Initialize idigbio API
     api = idigbio.json()
     

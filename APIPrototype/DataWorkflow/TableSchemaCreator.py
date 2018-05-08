@@ -5,12 +5,12 @@ import idigbio
 import sys
 from DBInfo import connectDB, tableExists
 
-'''
-Function that takes an idigbio query result as input and creates a database table
-table called "records" based on the fields (dictionary keys) present in the query.
-Table created in a PostgreSQL database called testdb
-'''
+
 def createSchema(result, table_name):
+    '''Function that takes an idigbio query result as input and creates a database table
+       based on the fields (dictionary keys) present in the query.
+       Table created in a PostgreSQL database called testdb
+    '''
     #Check that table does not already exist in database
     if tableExists(table_name):
         print("Table '" + table_name + "' already exists.")
@@ -126,10 +126,10 @@ def createSchema(result, table_name):
     print("Database table " + table_name + " has been created successfully.")
     
 
-'''
-    Main function for testing purposes only
-'''    
+   
 def main():
+    '''Main function for testing purposes only
+    ''' 
     #Initialize idigbio API
     api = idigbio.json()
     

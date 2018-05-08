@@ -1,26 +1,26 @@
 import psycopg2
 import sys
 
-'''
-    Script with functions that provide information or functionalities of PostgeSQL database.
-    This script is used by TableCreator and TableSchemaCreator scripts
+'''Script with functions that provide information or functionalities of PostgeSQL database.
+   This script is used by TableCreator and TableSchemaCreator scripts
 '''
 
 
-'''
-    Function for connecting to PostgreSQL database, returns connection object
-'''
+
 def connectDB():
+    '''Function for connecting to PostgreSQL database, returns connection object
+    '''
+    
     #Connect to database, db name is testdb
     connection = psycopg2.connect(database="testdb", user="postgres",
                               password="idigbio123", host="127.0.0.1", port="5432")
     return connection
 
 
-'''
-    Function for checking if table exists in database, returns True or False
-'''
 def tableExists(table_name):
+    '''Function for checking if table exists in database, returns True or False
+    '''
+    
     #Connect to DB
     connection = connectDB()
     
@@ -45,10 +45,10 @@ def tableExists(table_name):
     return tableExists
 
 
-'''
-    Main function for testing purposes
-'''
+
 def main():
+    '''Main function for testing purposes only
+    '''
     #Database table name used for getting info
     table_name = "records2"
     

@@ -1,15 +1,15 @@
 import records
 
 
-'''
-    A program that constructs a query to a PostgreSQL database based on search
-    terms defined in a dictionary called "rq", returns results in JSON format.
-    This script is used by the bottleAPIServer script.
+'''A module with functions that constructs a query to a PostgreSQL database based on search
+   terms defined in a dictionary called "rq", returns results in JSON format.
+   This script is used by the APIServer script.
 '''
 
 
-#Function that returns a set of records in JSON format from database
 def psqlQuery(rq, limit, table_name):
+    '''Returns dict of records from database matching query given in rq dictionary
+    '''
     #Connect to the database using URI of form "scheme://username:password@host/dbname
     #Current database name is testdb, username postgres with pw idigbio123
     db = records.Database("postgresql://postgres:idigbio123@localhost/testdb")
@@ -48,6 +48,9 @@ def psqlQuery(rq, limit, table_name):
 
 #Function for returning individual record in JSON format from database
 def psqlGetRecord(uuid, table_name):
+    '''Returns an individual record from database table given using "uuid" to
+       query for it.
+    '''
     #Connect to database
     db = records.Database("postgresql://postgres:idigbio123@localhost/testdb")
     
@@ -66,10 +69,9 @@ def psqlGetRecord(uuid, table_name):
     return row_json
 
 
-'''
-    Main function for testing purposes
-'''
 def main():
+    '''Main function for testing purposes only
+    '''
     #Test query dictionary
     rq = {
       "scientificname" : "panthera tigris",

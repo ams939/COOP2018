@@ -3,12 +3,12 @@ import urllib.request
 import json
 import sys
 
-'''
-    Function that returns a dictionary of records found using the rq dictionary
-    query parameters. Requires the rq dictionary and database table name as
-    arguments, parameter "limit" is optional (limits no. of records retreived)
-'''
+
 def searchRecords(rq, table_name, limit=None):
+    '''Function that returns a dictionary of records found using the rq dictionary
+       query parameters. Requires the rq dictionary and database table name as
+       arguments, parameter "limit" is optional (limits no. of records retreived) 
+    '''
     #Endpoint for conducting queries through API with rq search terms
     endpoint = "http://127.0.0.1:5000/" + table_name + "/search?"
     
@@ -28,11 +28,22 @@ def searchRecords(rq, table_name, limit=None):
     return result_dict
 
 
-'''
-    Function that returns a single record from database using the records
-    "uuid" field. Requires uuid and database table name being used for search
-'''
 def viewRecord(uuid, table_name):
+    '''Function that returns a single record from database using the records
+    
+    Parameters
+    ----------
+    uuid : string
+        idigbio uuid of record to be searched
+    table_name : string
+        name of table in local database
+        
+    Returns
+    -----------
+    record : dict
+        dictionary containing record data
+    
+    '''
     #API Endpoint for retrieving individual record by uuid
     endpoint = "http://127.0.0.1:5000/view/" + table_name + "/"
     
