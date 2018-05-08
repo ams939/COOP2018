@@ -1,0 +1,6 @@
+output
+
+venv/
+incorrectYears.txt
+.idea/
+backups/
