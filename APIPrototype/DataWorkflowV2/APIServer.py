@@ -52,9 +52,9 @@ def listing_handler(table):
         limit = None
     
     #Querying database with parameters
-    records = psqlQuery(rq, limit, table_name)
+    matches = psqlQuery(rq, limit, table_name)
     
-    return records
+    return matches
 
 #Start server
 bottle.run(app, host = "127.0.0.1", port = 5000, debug = True)

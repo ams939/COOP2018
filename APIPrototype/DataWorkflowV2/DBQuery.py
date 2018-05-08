@@ -1,5 +1,4 @@
 import records
-import json
 
 
 '''A module with functions that constructs a query to a PostgreSQL database based on search
@@ -9,9 +8,7 @@ import json
 
 
 def psqlQuery(rq, limit, table_name):
-    '''Returns dict of records from database matching query given in rq dictionary.
-       Returned dictionary has keys "itemCount" for record count and "items" for
-       list of records returned from query
+    '''Returns dict of records from database matching query given in rq dictionary
     '''
     #Connect to the database using URI of form "scheme://username:password@host/dbname
     #Current database name is testdb, username postgres with pw idigbio123
@@ -33,10 +30,7 @@ def psqlQuery(rq, limit, table_name):
     #Add limit to no. of records returned, if provided
     if limit != None:
         db_query_string += " LIMIT " + str(limit)
-    
-    #Dictionary for results from query
-    result = {}
-    
+        
     try:
         #Send query to database, response becomes "rows" list of dictionaries
         rows = db.query(db_query_string)
@@ -45,18 +39,10 @@ def psqlQuery(rq, limit, table_name):
         
     except Exception:
         err_msg = "Query not successful."
-        error_json = {"Error":err_msg} #Return error in JSON format
-        return error_json
+        rows_json = {"Error":err_msg}
     
-    #Convert JSON result to Python dictionary
-    rows = json.loads(rows_json)
-    
-    #Add query rows and count to results dictionary
-    result["itemCount"] = len(rows)
-    result["items"] = rows
-    
-    #Return query result
-    return result
+    #Return query result in JSON format
+    return rows_json
 
 
 
@@ -88,13 +74,14 @@ def main():
     '''
     #Test query dictionary
     rq = {
-      "scientificname" : "panthera onca"
+      "scientificname" : "panthera tigris",
+      "country" : "india"
       }
-    table_name = "records1"
+    table_name = "records"
     #Test uuid
     uuid = "816a6cef-e8c6-4606-b57f-1bf17294e29b"
-    #result = psqlGetRecord(uuid, table_name)
-    result = psqlQuery(rq,1, table_name)
+    result = psqlGetRecord(uuid, table_name)
+    result = psqlQuery(rq,1)
     
     print(result)
  
