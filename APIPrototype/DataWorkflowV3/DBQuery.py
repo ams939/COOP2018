@@ -25,13 +25,10 @@ def psqlQuery(rq, limit, table_name):
 
     #Build database query string from rq dictionary information
     for item in query_items:
-        #If last key-value pair in rq dictionary
         if query_items.index(item) == (len(query_items) - 1):
-            db_query_string += "lower(" + item[0] + ")='" + item[1].lower() + "'"
-        #Create query string for key-value pairs
+            db_query_string += item[0] + "='" + item[1] + "'"
         else:
-            #Note conversion of value to lowercase and SQL function lower()
-            db_query_string += "lower(" + item[0] + ")='" + item[1].lower() + "'" + " AND "
+            db_query_string += item[0] + "='" + item[1] + "'" + " AND "
     
     #Add limit to no. of records returned, if provided
     if limit != None:

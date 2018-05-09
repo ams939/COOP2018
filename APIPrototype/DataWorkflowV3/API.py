@@ -29,9 +29,20 @@ def searchRecords(rq, table_name, limit=None):
 
 
 def viewRecord(uuid, table_name):
-    '''Function that returns a single record from database using the record's
-       uuid, which is provided as an argument to the function along with the
-       name of the table to be queried
+    '''Function that returns a single record from database using the records
+    
+    Parameters
+    ----------
+    uuid : string
+        idigbio uuid of record to be searched
+    table_name : string
+        name of table in local database
+        
+    Returns
+    -----------
+    record : dict
+        dictionary containing record data
+    
     '''
     #API Endpoint for retrieving individual record by uuid
     endpoint = "http://127.0.0.1:5000/view/" + table_name + "/"
