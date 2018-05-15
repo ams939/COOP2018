@@ -8,7 +8,7 @@ from DBInfo import connectDB
    data into the database.
 '''
 
-def populateTable(result, table_name):
+def createTable(result, table_name):
     '''Function that takes idigbio query in dictionary format as argument variable "result"
     and inputs data contained within it into a database table, table name is passed
     to function as argument. Goes through each record in the query, extracts its
@@ -100,7 +100,7 @@ def main():
     TableSchemaCreator.createSchema(result, table_name)
     
     #Populate database table with values in query
-    populateTable(result, table_name)
+    createTable(result, table_name)
     
     
 if __name__ == "__main__":

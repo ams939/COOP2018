@@ -1,7 +1,4 @@
 from qsGenerator import queryURLBuilder
-from TableSchemaCreator import createSchema
-from TableCreator import populateTable
-import idigbio
 import urllib.request
 import json
 import sys
@@ -53,26 +50,6 @@ def viewRecord(uuid, table_name):
     record = json.loads(data.read().decode())
     
     return record
-
-def createTable(rq, table_name, limit=5000):
-    '''Function that allows user to create a table in a PostgreSQL database
-       that contains the results of a query to idigbio.
-       
-       Takes rq dictionary (containing query params),
-       table_name string (name of table to be created in DB) and
-       limit int (max no. of records to be returned) as arguments.
-    '''
-    #Initialize idigbio's API
-    api = idigbio.json()
-    
-    #Conduct query through API
-    results = api.search_records(rq, limit)
-    
-    #Create table & appropriate fields based on query result
-    createSchema(results, table_name)
-    
-    #Enter data in query into table
-    populateTable(results, table_name)
 
     
     
