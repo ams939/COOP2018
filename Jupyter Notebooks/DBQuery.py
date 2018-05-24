@@ -81,9 +81,13 @@ def psqlGetRecord(uuid, table_name):
         row_json = row.dataset.json
     except Exception:
         err_msg = "Query not successful."
-        row_json = {"Error":err_msg}
+        err_json = {"Error":err_msg}
+        return err_json
     
-    return row_json
+    #Convert to Python dictionary
+    result = json.loads(row_json)[0]
+    
+    return result
 
 
 def main():
@@ -96,8 +100,8 @@ def main():
     table_name = "records1"
     #Test uuid
     uuid = "816a6cef-e8c6-4606-b57f-1bf17294e29b"
-    #result = psqlGetRecord(uuid, table_name)
-    result = psqlQuery(rq,1, table_name)
+    result = psqlGetRecord(uuid, table_name)
+    #result = psqlQuery(rq,1, table_name)
     
     print(result)
  
