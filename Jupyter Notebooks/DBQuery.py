@@ -22,7 +22,18 @@ def psqlQuery(rq, limit, table_name):
 
     #Process rq dictionary, get list of key value tuples
     query_items = list(rq.items())
-
+    
+    '''
+    TODO: Fix the query building loop, currently query only works for string
+    values as the query terms are converted to & compared in lower case form.
+    Hence, does not work for integers, booleans, dates etc.
+    
+    Also field names should be put in double quotes in the query string as DB 
+    contains fields with upper case letters.
+    
+    Ref:
+    https://stackoverflow.com/questions/20878932/are-postgresql-column-names-case-sensitive
+    '''
     #Build database query string from rq dictionary information
     for item in query_items:
         #If last key-value pair in rq dictionary
@@ -54,6 +65,10 @@ def psqlQuery(rq, limit, table_name):
     #Convert JSON result to Python dictionary
     rows = json.loads(rows_json)
     
+    #Convert indexData field to Python dictionary
+    for record in rows:
+        record["indexData"] = json.loads(record["indexData"])
+    
     #Add query rows and count to results dictionary
     result["itemCount"] = len(rows)
     result["items"] = rows
@@ -84,8 +99,11 @@ def psqlGetRecord(uuid, table_name):
         err_json = {"Error":err_msg}
         return err_json
     
-    #Convert to Python dictionary
+    #Convert to Python dictionary, row_json is array of length 1 with all data at index 0
     result = json.loads(row_json)[0]
+    
+    #Convert indexData field from json string to python dict
+    result["indexData"] = json.loads(result["indexData"])
     
     return result
 
@@ -97,13 +115,13 @@ def main():
     rq = {
       "scientificname" : "panthera onca"
       }
-    table_name = "records1"
+    table_name = "records"
     #Test uuid
-    uuid = "816a6cef-e8c6-4606-b57f-1bf17294e29b"
-    result = psqlGetRecord(uuid, table_name)
-    #result = psqlQuery(rq,1, table_name)
+    uuid = "c7c66f6f-52a0-411c-bb2a-460818e87bfe"
+    #result = psqlGetRecord(uuid, table_name)
+    result = psqlQuery(rq,1, table_name)
     
-    print(result)
+    print(type(result["items"][0]["indexData"]))
  
     
 if __name__ == "__main__":
