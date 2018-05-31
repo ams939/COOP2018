@@ -1,7 +1,8 @@
 import qsGenerator
 
 rq = {
-      "country":"india"
+      "institutioncode":"amnh",
+      "country":"colombia"
       }
 
 qs = qsGenerator.qsGenerator(rq)

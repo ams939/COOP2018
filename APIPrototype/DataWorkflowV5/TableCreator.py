@@ -1,5 +1,4 @@
 import idigbio
-import json
 import TableSchemaCreator
 from DBInfo import connectDB
 
@@ -39,15 +38,11 @@ def populateTable(result, table_name):
             #Data key, same as database field name
             key = keys_values[i][0]
             
-            #Convert values to string format, indexData dictionary stored as json str
-            if key == "indexData":
-                value = json.dumps(keys_values[i][1]) 
-            else:
-                value = str(keys_values[i][1])
-                
-            #Replacing single quotes with double single quotes to escape them
-            #in query command (avoid mismatching single quotes)
-            value = value.replace("'", "''")
+            #Unstandardized data value, converted to string
+            raw_value = str(keys_values[i][1])
+            
+            #Standardize value data by replacing single quotes with doubles (to avoid mismatching quotes)
+            value = raw_value.replace("'", '"')
             
             #Standardize dates (eliminate timezone & time)
             if key == "datecollected" or key == "datemodified":
@@ -99,7 +94,7 @@ def main():
     #Assign query results
     result = api.search_records(rq, limit=5000)
     
-    table_name = "records"
+    table_name = "records1"
     
     #Use query results to create database table with all needed fields
     TableSchemaCreator.createSchema(result, table_name)
