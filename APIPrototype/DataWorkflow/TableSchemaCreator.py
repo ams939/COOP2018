@@ -49,7 +49,7 @@ def createSchema(result, table_name):
     special_fields = ["typestatus", "data", "datecollected", "datemodified", 
                       "indexData", "flags", "recordids", "locality", 
                       "verbatimlocality", "collector", "commonnames", 
-                      "mediarecords", "highertaxon"]
+                      "mediarecords", "highertaxon", "geopoint"]
 
 
     #Iterate through each record in idigbio query result dictionary 

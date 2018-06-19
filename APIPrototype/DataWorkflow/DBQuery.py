@@ -65,9 +65,15 @@ def psqlQuery(rq, limit, table_name):
     #Convert JSON result to Python dictionary
     rows = json.loads(rows_json)
     
-    #Convert indexData field to Python dictionary
+    #Unpack special fields
     for record in rows:
+        #Convert indexData field to Python dictionary (stored as json string)
         record["indexData"] = json.loads(record["indexData"])
+        
+        #Convert geopoint field to dictionary (stored as json string)
+        if record["geopoint"] != None:
+            record["geopoint"] = json.loads(record["geopoint"])
+    
     
     #Add query rows and count to results dictionary
     result["itemCount"] = len(rows)

@@ -39,9 +39,11 @@ def populateTable(result, table_name):
             #Data key, same as database field name
             key = keys_values[i][0]
             
-            #Convert values to string format, indexData dictionary stored as json str
+            #Convert values to string format, indexData & geopoint dictionaries stored as json string
             if key == "indexData":
-                value = json.dumps(keys_values[i][1]) 
+                value = json.dumps(keys_values[i][1])
+            elif key == "geopoint":
+                value = json.dumps(keys_values[i][1])
             else:
                 value = str(keys_values[i][1])
                 
@@ -94,12 +96,12 @@ def main():
     api = idigbio.json()
     
     #Define query dictionary
-    rq = {"genus":"panthera"}
+    rq = {"genus":"himantura"}
     
     #Assign query results
     result = api.search_records(rq, limit=5000)
     
-    table_name = "records"
+    table_name = "stingrays"
     
     #Use query results to create database table with all needed fields
     TableSchemaCreator.createSchema(result, table_name)
