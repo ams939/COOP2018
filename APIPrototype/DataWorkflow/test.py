@@ -2,9 +2,18 @@ import API
 import idigbio
 from pprint import pformat
 import json
+from iDigBioQuery import idigbioQuery
 '''
 Developer script for testing the API
 '''
+rq = 
+
+
+
+
+'''
+# Testing offsets
+
 api = idigbio.json()
 
 rq = {"family":"felidae"}
@@ -15,8 +24,14 @@ offset = 50579
 results = api.search_records(rq, offset=50579)
 
 print(len(results["items"]))
+'''
+
+
+
 
 '''
+#Testing true false values in data stored in local DB
+
 uuid = "c7c66f6f-52a0-411c-bb2a-460818e87bfe"
 table_name = "records"
 
