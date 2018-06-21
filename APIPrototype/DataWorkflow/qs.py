@@ -2,6 +2,11 @@ import qsGenerator
 from urllib.parse import urlencode
 import idigbio
 
+'''
+Testing script, not a part of the API. Used for creating URL addresses for
+queries to the API
+'''
+
 #Initialize idigbio's API
 api = idigbio.json()
 

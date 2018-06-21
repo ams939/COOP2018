@@ -1,4 +1,8 @@
 from API import searchRecords, viewRecord, createTable
+'''
+Main script, example of a script that user would create to interact with the API
+'''
+
 
 def main():
     rq = {

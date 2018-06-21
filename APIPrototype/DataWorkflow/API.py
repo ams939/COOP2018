@@ -54,7 +54,7 @@ def viewRecord(uuid, table_name):
     
     return record
 
-def createTable(rq, table_name, limit=5000):
+def createTable(rq, table_name, limit=None):
     '''Function that allows user to create a table in a PostgreSQL database
        that contains the results of a query to idigbio.
        
@@ -65,6 +65,9 @@ def createTable(rq, table_name, limit=5000):
     #Initialize idigbio's API
     api = idigbio.json()
     
+    '''
+    Change the call to idigbio API to a call to idigbioQuery.py
+    '''
     #Conduct query through API
     results = api.search_records(rq, limit)
     
