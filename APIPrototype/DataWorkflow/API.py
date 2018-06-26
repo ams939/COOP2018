@@ -1,7 +1,7 @@
 from qsGenerator import queryURLBuilder
 from TableSchemaCreator import createSchema
 from TableCreator import populateTable
-import idigbio
+from iDigBioQuery import idigbioQuery
 import urllib.request
 import json
 import sys
@@ -62,14 +62,8 @@ def createTable(rq, table_name, limit=None):
        table_name string (name of table to be created in DB) and
        limit int (max no. of records to be returned) as arguments.
     '''
-    #Initialize idigbio's API
-    api = idigbio.json()
-    
-    '''
-    Change the call to idigbio API to a call to idigbioQuery.py
-    '''
-    #Conduct query through API
-    results = api.search_records(rq, limit)
+    #Conduct query to idigbio, retrieves results as dict
+    results = idigbioQuery(rq, limit)
     
     #Create table & appropriate fields based on query result
     createSchema(results, table_name)

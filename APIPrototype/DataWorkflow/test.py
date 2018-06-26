@@ -6,9 +6,11 @@ from iDigBioQuery import idigbioQuery
 '''
 Developer script for testing the API
 '''
-rq = 
+rq = {"family":"felidae"}
 
+table_name = "felidae"
 
+API.createTable(rq, table_name)
 
 
 '''

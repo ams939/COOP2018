@@ -96,13 +96,17 @@ def idigbioQuery(rq, limit=None):
                 
 
 def main():
-    rq = {"family" : "felidae"}
+    '''
+    Main function for testing purposes only
+    '''
+    rq = {"scientificname" : "lynx canadensis"}
     
-    results = idigbioQuery(rq, limit=45700)
+    results = idigbioQuery(rq)
     
     print(type(results))
     print(len(results["items"]))
     print(results.keys())
+    
 
 if __name__ == "__main__":
     main()    
