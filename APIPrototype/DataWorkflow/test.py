@@ -6,11 +6,12 @@ from iDigBioQuery import idigbioQuery
 '''
 Developer script for testing the API
 '''
-rq = {"family":"felidae"}
+rq = {"genus":"channa"}
 
-table_name = "felidae"
+table_name = "snakehead"
 
 API.createTable(rq, table_name)
+#API.deleteTable(table_name)
 
 
 '''

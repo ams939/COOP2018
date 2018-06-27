@@ -2,6 +2,7 @@ from qsGenerator import queryURLBuilder
 from TableSchemaCreator import createSchema
 from TableCreator import populateTable
 from iDigBioQuery import idigbioQuery
+from DBInfo import delTable
 import urllib.request
 import json
 import sys
@@ -70,6 +71,15 @@ def createTable(rq, table_name, limit=None):
     
     #Enter data in query into table
     populateTable(results, table_name)
+    
+    
+def deleteTable(table_name):
+    '''Function for deleting a table from the local database defined in the
+       DBInfo script. Takes table's name as argument and notifies user of
+       success/failure status of deletion.
+    '''
+    #Table deletion function
+    delTable(table_name)
 
     
     
