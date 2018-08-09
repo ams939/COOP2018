@@ -47,6 +47,32 @@ def tableExists(table_name):
     
     return tableExists
 
+def columnExists(tablename, columnname):
+    '''
+    Checks is a given column name exists in the given table within the local
+    database.
+    '''
+    
+    #Connect to database & initialize cursor
+    connection = connectDB()
+    cursor = connection.cursor()
+    
+    #Build command for checking column existence
+    query = ("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE "
+                             "table_name = '" + tablename + 
+                             "' AND column_name = '" + columnname + "');")
+    #Send query to database
+    cursor.execute(query)
+    
+    #Access results from query
+    column_exists = cursor.fetchone()[0]
+    
+    #Operations in DB complete, close connection
+    cursor.close()
+    connection.close()
+    
+    return column_exists
+
 
 def delTable(table_name):
     '''
@@ -79,7 +105,8 @@ def delTable(table_name):
     
 def executeCommand(command):
     '''
-    Function that sends command passed to it as a string to the local DB
+    Function that sends command passed to it as a string to the local DB, only
+    useful for commands where output is not needed as function returns nothing
     '''
     #Connect to local DB
     connection = connectDB()

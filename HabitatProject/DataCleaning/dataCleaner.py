@@ -1,6 +1,7 @@
 import DBInfo
 import records
 import json
+import csv
 
 '''
 The purpose of this script is to provide a variety of tools for cleaning up and
@@ -9,6 +10,7 @@ custom scripts like DBInfo to work with a local database, the format of the
 data in the local database is assumed to be as produced by the DataWorkflow
 scripts. 
 '''
+
 
 def selectColumns(column_names, tablename, new_tablename):
     '''
@@ -27,6 +29,12 @@ def selectColumns(column_names, tablename, new_tablename):
         print("Table " + new_tablename + " already exists.")
         return
     
+    #Check that given columns exist in DB
+    for column in column_names:
+        if not DBInfo.columnExists(tablename, column):
+            print("Column " + column + " does not exist in table" + tablename)
+            return
+    
     #Base string for command to DB
     command = "CREATE TABLE " + new_tablename + " AS SELECT "
     
@@ -36,19 +44,22 @@ def selectColumns(column_names, tablename, new_tablename):
     #Send command to database (prints error if fails)
     DBInfo.executeCommand(command)
     
+    
 def outputGeolocateCSV(tablename, filename):
     '''
     Takes a table in the local database and outputs it as a CSV file into
     script directory. Takes name of table to be copied and output filename
     as arguments. Only outputs uuid, locality, country, stateprovince and
-    county which will be used in geolocation process
+    county which will be used in geolocation process. Table that data is
+    copied from the clean data table that has lon. & lat. fields.
     '''
     if not DBInfo.tableExists(tablename):
         print("Table " + tablename + " does not exist.")
         return
     
-    #Query resulting in all rows & columns
-    query = "SELECT locality, country, stateprovince, county, uuid FROM " + tablename
+    #Query resulting in rows & columns with NULL lon, lat
+    query = "SELECT locality, country, stateprovince, county, latitude, longitude, uuid FROM " + \
+    tablename + " WHERE latitude IS NULL OR longitude IS NULL"
     
     #Command to be passed to DB
     command = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query)
@@ -63,6 +74,64 @@ def outputGeolocateCSV(tablename, filename):
     cursor.close()
     connection.close()
     
+
+def inputGeolocateCSV(tablename, filename):
+    '''
+    Function that reads csv file with geolocated specimen data and stores
+    results (lon & lat) in local db table. Expects csv file to be in format 
+    defined in the Geolocate CSV formatting specifications.
+    '''
+    #Connect to database
+    connection = DBInfo.connectDB()
+    cursor = connection.cursor()
+    
+    #Check that table given exists
+    if not DBInfo.tableExists(tablename):
+        print("Table " + tablename + " does not exist.")
+    
+    #Check that file given is readable
+    try:
+        csvfile = open(filename, "r")
+        reader = csv.DictReader(csvfile)
+    except IOError as e:
+        print("File " + filename + " could not be read.")
+        return 
+  
+    for row in reader:
+        lat, lon = row["latitude"], row["longitude"]
+        uuid = row["uuid"]
+        flag = "Georeferenced"
+                
+        #Skip rows with no lat or lon value
+        if lat == None or lon == None:
+            continue
+        
+        #Build database insert command
+        cmd = \
+        '''UPDATE {0} SET latitude = {1}, longitude = {2}, flags = '{3}' WHERE uuid = {4}'''\
+        .format(tablename, lat, lon, flag, uuid)
+        
+        cmd = "UPDATE " + tablename + " SET latitude = " + lat \
+        + ", longitude = " + lon + ", flags = '" + flag + "' " \
+        + "WHERE uuid = '" + uuid + "'"
+        
+        try:
+            cursor.execute(cmd)
+        except connection.ProgrammingError as e:
+            connection.rollback()
+            print("There was an error with inputting data into the DB:")
+            print(e)
+            continue
+            
+        #Save changes to local database
+        connection.commit()
+    
+    #Close connection to database and close file
+    cursor.close()
+    connection.close()
+    csvfile.close()
+
+  
 def geopointProcessor(tablename, new_tablename):
     '''
     Retrieves geopoint information from raw data table, appends it into cleaned
@@ -86,6 +155,7 @@ def geopointProcessor(tablename, new_tablename):
     try:
         cursor.execute("ALTER TABLE " + new_tablename + " ADD COLUMN longitude DECIMAL")
         cursor.execute("ALTER TABLE " + new_tablename + " ADD COLUMN latitude DECIMAL")
+        cursor.execute("ALTER TABLE " + new_tablename + " ADD COLUMN flags TEXT")
     except connection.ProgrammingError as e:
         print("An error occured: ")
         print(e)
@@ -126,6 +196,7 @@ def geopointProcessor(tablename, new_tablename):
                 print("An error has occurred:")
                 print(e)
                 print("Ommitting record " + uuid)
+                continue
         
         #Commit added lat & lon info into database
         connection.commit()
@@ -133,25 +204,22 @@ def geopointProcessor(tablename, new_tablename):
     #Terminate connection to DB
     cursor.close()
     connection.close()
-            
-    
-    
-    
-    
+ 
+ 
 def main():
     '''
     Main function, for testing purposes only
     '''
     columns = ["uuid", "scientificname", "locality"]
-    tablename = "pumaconcolor"
-    new_tablename = "pumatest"
+    tablename = "leoparduspardalis"
+    new_tablename = "leoparduspardalis_cleaned"
     filename = "csvtest.csv"
     
     #outputGeolocateCSV(tablename, filename)
     
     selectColumns(columns, tablename, new_tablename)
     
-    geopointProcessor(tablename, new_tablename)
+    #geopointProcessor(tablename, new_tablename)
     
     
     
