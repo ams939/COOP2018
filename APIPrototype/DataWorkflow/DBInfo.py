@@ -76,7 +76,35 @@ def delTable(table_name):
     #Operations with DB complete, close conenction to server
     cursor.close()
     connection.close()
+    
+def executeCommand(command):
+    '''
+    Function that sends command passed to it as a string to the local DB, only
+    useful for commands where output is not needed as function returns nothing
+    '''
+    #Connect to local DB
+    connection = connectDB()
+    
+    #Initialize DB cursor
+    cursor = connection.cursor()
+    
+    #Try executing command
+    try:
+        cursor.execute(command)
+    #If command fails, rollback the command
+    except connection.ProgrammingError as e:
+        connection.rollback()
+        print("There was an error executing the command:")
+        print(e)
+        return
         
+    #Commit record to database
+    connection.commit()
+    
+    #Operations with DB complete, close conenction to server
+    cursor.close()
+    connection.close()
+
 
 def main():
     '''Main function for testing purposes only
