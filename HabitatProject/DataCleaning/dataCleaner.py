@@ -1,12 +1,12 @@
 import DBInfo
-import records
+import psycopg2.extras
 import json
 import csv
 
 '''
 The purpose of this script is to provide a variety of tools for cleaning up and
 processing iDigBio data in a PostgreSQL database. This script utilizes other
-custom scripts like DBInfo to work with a local database, the format of the
+custom scripts like DBInfo to work with the local database, the format of the
 data in the local database is assumed to be as produced by the DataWorkflow
 scripts. 
 '''
@@ -41,25 +41,36 @@ def selectColumns(column_names, tablename, new_tablename):
     #Create string of column names separated by commas for command
     command += ", ".join(column_names) + " FROM " + tablename
     
-    #Send command to database (prints error if fails)
-    DBInfo.executeCommand(command)
+    #Send command to database and commit change
+    connection = DBInfo.connectDB()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(command)
+    except connection.ProgrammingError as e:
+        print("There was an error with the local database:")
+        print(e)
+        return
+    
+    connection.commit()
+    
+    print("Table " + new_tablename + " has been created.")
     
     
 def outputGeolocateCSV(tablename, filename):
     '''
-    Takes a table in the local database and outputs it as a CSV file into
-    script directory. Takes name of table to be copied and output filename
-    as arguments. Only outputs uuid, locality, country, stateprovince and
-    county which will be used in geolocation process. Table that data is
-    copied from the clean data table that has lon. & lat. fields.
+    Takes a table in the local database created by the select columns script
+    and outputs it as a CSV file into script directory. Takes name of table to 
+    be copied and output filename as arguments. Only outputs uuid, locality, 
+    country, stateprovince and county which will be used in geolocation process.
+    Omits records with no locality string from CSV as they cannot be georeferenced.
     '''
     if not DBInfo.tableExists(tablename):
         print("Table " + tablename + " does not exist.")
         return
     
-    #Query resulting in rows & columns with NULL lon, lat
+    #Query resulting in rows & columns with NULL lon, lat and non-NULL locality string
     query = "SELECT locality, country, stateprovince, county, latitude, longitude, uuid FROM " + \
-    tablename + " WHERE latitude IS NULL OR longitude IS NULL"
+    tablename + " WHERE locality IS NOT NULL AND (latitude IS NULL OR longitude IS NULL)"
     
     #Command to be passed to DB
     command = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query)
@@ -70,6 +81,9 @@ def outputGeolocateCSV(tablename, filename):
     
     with open(filename, "w") as file:
         cursor.copy_expert(command, file)
+        
+    print("A file containing the table " + tablename + " called " + filename +
+          " has been saved to the script's directory.")
     
     cursor.close()
     connection.close()
@@ -100,7 +114,7 @@ def inputGeolocateCSV(tablename, filename):
     for row in reader:
         lat, lon = row["latitude"], row["longitude"]
         uuid = row["uuid"]
-        flag = "Georeferenced"
+        flag = '["geolocate_georeference"]'
                 
         #Skip rows with no lat or lon value
         if lat == None or lon == None:
@@ -108,12 +122,9 @@ def inputGeolocateCSV(tablename, filename):
         
         #Build database insert command
         cmd = \
-        '''UPDATE {0} SET latitude = {1}, longitude = {2}, flags = '{3}' WHERE uuid = {4}'''\
+        "UPDATE {0} SET latitude = {1}, longitude = {2}, flags = '{3}' WHERE uuid = {4}"\
         .format(tablename, lat, lon, flag, uuid)
         
-        cmd = "UPDATE " + tablename + " SET latitude = " + lat \
-        + ", longitude = " + lon + ", flags = '" + flag + "' " \
-        + "WHERE uuid = '" + uuid + "'"
         
         try:
             cursor.execute(cmd)
@@ -166,8 +177,9 @@ def geopointProcessor(tablename, new_tablename):
     connection.commit()
     
     #Retrieve geopoint and uuid info from raw data table
-    db = records.Database("postgresql://postgres:idigbio123@localhost/testdb")
-    rows = db.query("SELECT uuid, geopoint FROM " + tablename)
+    cursor = connection.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    cursor.execute("SELECT uuid, geopoint FROM " + tablename)
+    rows = cursor.fetchall()
     
     #Extract lat & lon info from each record that has it
     for row in rows:
@@ -175,8 +187,9 @@ def geopointProcessor(tablename, new_tablename):
             #Extract lon & lat from geopoint
             geopoint = json.loads(row["geopoint"])
             lon, lat = geopoint["lon"], geopoint["lat"]
+            flag = '["idigbio_georeference"]'
             
-            #Validate lon & lat values
+            #Validate lon & lat values, if invalid proceed to next record
             if -90 > lat > 90:
                 continue
             if -180 > lon > 180:
@@ -188,7 +201,10 @@ def geopointProcessor(tablename, new_tablename):
             uuid = row["uuid"]
             
             #Build insert command for new table, lookup done using uuid
-            cmd = "UPDATE {0} SET longitude = {1}, latitude = {2} WHERE uuid = '{3}'".format(new_tablename, lon, lat, uuid)
+            cmd = \
+            "UPDATE {0} SET longitude = {1}, latitude = {2}, flags = '{3}' WHERE uuid = '{4}'"\
+            .format(new_tablename, lon, lat, flag, uuid)
+            
             try:
                 cursor.execute(cmd)
             except connection.ProgrammingError as e:
@@ -200,6 +216,100 @@ def geopointProcessor(tablename, new_tablename):
         
         #Commit added lat & lon info into database
         connection.commit()
+    
+    print("Geopoint information from table " + tablename +
+          "has been successfully appended to table " + new_tablename)
+    
+    #Terminate connection to DB
+    cursor.close()
+    connection.close()
+    
+def selectTimeRange(tablename, start = None, end = None):
+    '''
+    Function for removing records from local database table that are outside
+    a time range specified by the user. If end date not given, defaults to current
+    date. Also removes records with null or unrealistic date. 
+    Dates given in YYYY-MM-DD format.
+    '''
+    #Validate database table
+    if not DBInfo.tableExists(tablename):
+        print("Table " + tablename + "does not exist.")
+        return
+    if not DBInfo.columnExists(tablename, "datecollected"):
+        print("Table " + tablename + " does not have column 'datecollected'")
+        return
+    
+    #Connect to DB
+    connection = DBInfo.connectDB()
+    cursor = connection.cursor()
+    
+    #Command for removing records with null date or date in future
+    cmd = \
+    "DELETE FROM {0} WHERE datecollected IS NULL OR datecollected >= CURRENT_DATE"\
+    .format(tablename)
+    
+    cursor.execute(cmd)
+    connection.commit()
+    
+    #Determine appropriate command based on dates given
+    if start == None and end == None:
+        return
+    elif start == None and end != None:
+        cmd = "DELETE FROM {0} WHERE datecollected > '{1}'".format(tablename, end)
+    elif start != None and end == None:
+        cmd = \
+        "DELETE FROM {0} WHERE datecollected < '{1}'".format(tablename, start)
+    elif start != None and end != None:
+        cmd = \
+        "DELETE FROM {0} WHERE datecollected < '{1}' OR datecollected > '{2}'" \
+        .format(tablename, start, end)
+    else:
+        return
+    
+    try:
+        cursor.execute(cmd)
+    except connection.ProgrammingError as e:
+        print("An error occured: ")
+        print(e)
+        return
+    
+    #Save changes to local database
+    connection.commit()
+    
+    print("Records outside specified time range have been successfully deleted")
+    
+    #Terminate connection to DB
+    cursor.close()
+    connection.close()
+    
+def deleteNullPoints(tablename):
+    '''
+    Function that deletes records in local database that have no lon, lat
+    information.
+    '''
+    if not DBInfo.tableExists(tablename):
+        print("Table " + tablename + "does not exist.")
+        return
+    if not DBInfo.columnExists(tablename, "longitude") or not DBInfo.columnExists(tablename, "latitude"):
+        print("Table does not contain longitude or latitude column.")
+        return
+    
+    connection = DBInfo.connectDB()
+    cursor = connection.cursor()
+    
+    cmd = "REMOVE FROM {0} WHERE longitude IS NULL OR latitude IS NULL".format(tablename)
+    
+    try:
+        cursor.execute(cmd)
+    except connection.ProgrammingError as e:
+        print("An error has occurred:")
+        print(e)
+        return
+    
+    #Save changes to the local database
+    connection.commit()
+    
+    print("Records with blank lon. or lat. fields have been succesfully removed.")
     
     #Terminate connection to DB
     cursor.close()
@@ -220,13 +330,7 @@ def main():
     selectColumns(columns, tablename, new_tablename)
     
     #geopointProcessor(tablename, new_tablename)
-    
-    
-    
-    
+     
 
 if __name__ == "__main__":
     main()
-    
-    
-    
