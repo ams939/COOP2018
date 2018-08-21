@@ -2,6 +2,8 @@ import DBInfo
 import psycopg2.extras
 import json
 import csv
+import pandas as pd
+import codecs
 
 '''
 The purpose of this script is to provide a variety of tools for cleaning up and
@@ -80,12 +82,30 @@ def outputGeolocateCSV(tablename, filename):
     connection = DBInfo.connectDB()
     cursor = connection.cursor()
     
+    #Extract values from database table to csv file
     with open(filename, "w") as file:
         cursor.copy_expert(command, file)
         
+    #Change encoding of file to UTF8
+    with codecs.open(filename, "r", encoding = "cp1252") as file:
+        lines = file.read()
+    
+    with codecs.open(filename, "w", encoding = "utf8") as file:
+        file.write(lines)
+    
+    #Append columns to csv file that Geolocate needs
+    df = pd.read_csv(filename, encoding = "utf8")
+    df.insert(6, "correction status", "")
+    df.insert(7, "precision","")
+    df.insert(8, "error polygon", "")
+    df.insert(9, "multiple results", "")
+    df.to_csv(filename, index = False)
+    
+    
     print(f"A file called {filename} containing the table {tablename}"
           " has been saved to the script's directory.")
     
+    #Terminate connection to database
     cursor.close()
     connection.close()
     
