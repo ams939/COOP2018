@@ -65,6 +65,7 @@ def outputGeolocateCSV(tablename, filename):
     be copied and output filename as arguments. Only outputs uuid, locality, 
     country, stateprovince and county which will be used in geolocation process.
     Omits records with no locality string from CSV as they cannot be georeferenced.
+    Outputted file is encoded in UTF-8 format.
     '''
     if not DBInfo.tableExists(tablename):
         print(f"Table {tablename} does not exist.")
@@ -114,7 +115,8 @@ def inputGeolocateCSV(tablename, filename):
     '''
     Function that reads csv file with geolocated specimen data and stores
     results (lon & lat) in local db table. Expects csv file to be in format 
-    defined in the Geolocate CSV formatting specifications.
+    defined in the Geolocate CSV formatting specifications. NOTE: CSV file must
+    be in UTF-8 encoding format.
     '''
     #Connect to database
     connection = DBInfo.connectDB()
@@ -127,7 +129,7 @@ def inputGeolocateCSV(tablename, filename):
     
     #Check that file given is readable
     try:
-        csvfile = open(filename, "r")
+        csvfile = open(filename, "r", encoding = "utf8")
         reader = csv.DictReader(csvfile)
     except IOError as e:
         print(f"File {filename} could not be read.")
