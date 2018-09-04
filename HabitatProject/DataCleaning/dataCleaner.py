@@ -376,6 +376,42 @@ def deleteDuplicates(tablename):
     
     print(f"{rows_affected} duplicates successfully removed.")
     
+def deleteRecord(uuid, tablename):
+    '''
+    Function that deletes a record from the local database based on table
+    and record uuid given by user.
+    '''
+    #Check that table exists
+    if not DBInfo.tableExists(tablename):
+        print(f"Table {tablename} does not exist.")
+        return
+    
+    #Initialize connection to local DB
+    connection = DBInfo.connectDB()
+    cursor = connection.cursor()
+    
+    #Build query
+    cmd = f"DELETE FROM {tablename} WHERE uuid = '{uuid}'"
+    
+    #Send command to local DB
+    try:
+        cursor.execute(cmd)
+        rows_affected = cursor.rowcount
+    except connection.ProgrammingError as e:
+        print("There was an error:")
+        print(e)
+        connection.close()
+        return
+    
+    print(f"{rows_affected} rows affected.")
+    
+    #Save changes to DB and terminate connection
+    connection.commit()
+    cursor.close()
+    connection.close()
+    
+    
+    
  
 def main():
     '''
