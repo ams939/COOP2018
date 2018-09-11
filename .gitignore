@@ -4,3 +4,5 @@ venv/
 incorrectYears.txt
 .idea/
 backups/
+HabitatProject/Layerdata
+HabitatProject/LayerExtractor/setNoData.py

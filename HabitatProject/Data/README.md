@@ -1,10 +1,10 @@
 ## American Feline Habitat Project Data Legend
 
 #### Species included in this data
-Panthera Onca - "Jaguar"\n
-Leopardus Pardalis - "Ocelot"\n
-Puma Concolor - "Mountain Lion/Puma/Cougar"\n
-Lynx Canadensis - "Canadian Lynx"\n
+Panthera Onca - "Jaguar",
+Leopardus Pardalis - "Ocelot",
+Puma Concolor - "Mountain Lion/Puma/Cougar",
+Lynx Canadensis - "Canadian Lynx"
 
 #### raw_data.zip
 Contains the raw species data files used in this project in csv format, UTF-8 encoded. This data was downloaded from www.iDigBio.orq using their Python API.

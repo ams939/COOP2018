@@ -1,4 +1,0 @@
-http://127.0.0.1:5000/records/search?rq=%7B%22family%22%3A+%22felidae%22%7D&limit=5
-
-
-http://127.0.0.1:5000/records/search?rq=%7B%22scientificname%22%3A+%22Puma+Concolor%22%2C+%22countrycode%22%3A+%22KEN%22%2C+%22institution+code%22%3A+%22UTEP%22%2C+%22family%22%3A+%22felidae%22%7D
