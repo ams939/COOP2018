@@ -1,7 +1,6 @@
-Important information concerning the code and data used in this project
+## Important information concerning the code and data used in this project
 
--------------------------------------------------------------------------------------------------
-feline_data.csv
+#### feline_data.csv
 
 -Aggregate of data from multiple data sources. Species data consisting of the uuid, genus,
  specificepithet, longitude and latitude columns has been retrieved from www.iDigBio.org
@@ -18,8 +17,7 @@ feline_data.csv
 -Data in the elevation column was retrieved from USGS's Global Multi-Resolution Terrain Elevation
  Data 2010. Available at https://topotools.cr.usgs.gov/gmted_viewer/, retrieved August 2018.
 
----------------------------------------------------------------------------------------------------
-SOM notebooks
+#### SOM notebooks
 
 Much of the code in the SOM notebooks has been copied & modified from code in Shane Lynn's article:
 https://www.r-bloggers.com/self-organising-maps-for-customer-segmentation-using-r/
