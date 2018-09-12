@@ -15,6 +15,11 @@ Cleaned species data in csv format, UTF-8 encoded. Cleaning entailed choosing re
 Cleaning also entailed adding longitude and latitude fields to this data that contain the information within the raw data's "geopoint" field.
 Records that had sufficient locality information for georeferencing were georeferenced using Geolocate (www.geo-locate.org), records without coordinates after this step were removed.
 
+#### Geolocate folder
+Contains specimen records from original [species_name]_cleaned data that did not have coordinate information but have been given coordinates using Geolocate.
+Records with sufficient locality information were georeferenced using Geolocate's batch processing tool. Data with _raw ending is in raw format as csv files with no duplicate or blank results removed. Files without _raw ending have been cleaned and were used to create the final [species name]_cleaned table.
+Filename abbreviations: pc - puma concolor, po - panthera onca, lc - lynx canadensis, lp - leopardus pardalis
+
 #### [species name]_set.csv
 Cleaned species data in csv format, UTF-8 encoded. This data is a cut down version of the <species name>_cleaned data, containing only uuid, genus, specificepithet, longitude and latitude from the dataset.
 This data has new columns elevation, temperature, precipitation and landcover which are populated with data sampled from geographic layer data as follows:
@@ -31,4 +36,4 @@ landcover - USGS Land Cover Institute's 0.5km MODIS-based Gloval Land Cover Clim
 All layer files were retreived in August 2018. Layers were cropped to cover North & South America. Sampling of layers was done using Python's rasterio library.
 
 #### feline_data.csv
-Combination of the four [species name]_set files into a single csv file thats purpose is to be fed to a Self-Organizing map for data analysis. 
+Combination of the four [species name]_set files into a single csv file thats purpose is to be fed to a Self-Organizing map for data analysis.

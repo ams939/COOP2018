@@ -24,7 +24,7 @@ def tableExists(table_name):
        as argument to function, returns True or False
     '''
     
-    #Connect to DB
+    #Connect to local DB
     connection = connectDB()
     
     #Initialize cursor
@@ -47,19 +47,104 @@ def tableExists(table_name):
     
     return tableExists
 
+def columnExists(tablename, columnname):
+    '''
+    Checks is a given column name exists in the given table within the local
+    database.
+    '''
+    
+    #Connect to database & initialize cursor
+    connection = connectDB()
+    cursor = connection.cursor()
+    
+    #Build command for checking column existence
+    query = ("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE "
+                             "table_name = '" + tablename + 
+                             "' AND column_name = '" + columnname + "');")
+    #Send query to database
+    cursor.execute(query)
+    
+    #Access results from query
+    column_exists = cursor.fetchone()[0]
+    
+    #Operations in DB complete, close connection
+    cursor.close()
+    connection.close()
+    
+    return column_exists
+
+
+def delTable(table_name):
+    '''
+    Function for deleting a table in local DB, takes table's name as argument.
+    Prints out whether deletion was successful or not.
+    '''
+    #Connect to local DB
+    connection = connectDB()
+    
+    #Initialize DB cursor
+    cursor = connection.cursor()
+    
+    #Define table deletion query
+    query = "DROP TABLE " + table_name
+    
+    #Check that table exists
+    if tableExists(table_name):
+        #Send query to local DB
+        cursor.execute(query)
+        #Commit changes to local DB
+        connection.commit()
+        print("Table '" + table_name + "' has been successfully deleted.")
+        
+    else:
+        print("Table '" + table_name + "' does not exist in the local database.")
+        
+    #Operations with DB complete, close conenction to server
+    cursor.close()
+    connection.close()
+    
+def executeCommand(command):
+    '''
+    Function that sends command passed to it as a string to the local DB, only
+    useful for commands where output is not needed as function returns nothing
+    '''
+    #Connect to local DB
+    connection = connectDB()
+    
+    #Initialize DB cursor
+    cursor = connection.cursor()
+    
+    #Try executing command
+    try:
+        cursor.execute(command)
+    #If command fails, rollback the command
+    except connection.ProgrammingError as e:
+        connection.rollback()
+        print("There was an error executing the command:")
+        print(e)
+        return
+        
+    #Commit record to database
+    connection.commit()
+    
+    #Operations with DB complete, close conenction to server
+    cursor.close()
+    connection.close()
 
 
 def main():
     '''Main function for testing purposes only
     '''
     #Database table name used for getting info
-    table_name = "records2"
+    table_name = "snakehead"
     
     if tableExists(table_name):
         print("Table '" + table_name + "' exists.\n")
     else:
         print("Table '" + table_name + "' does not exist")
         sys.exit(0)
+    
+    delTable(table_name)
     
     
 if __name__ == "__main__":
