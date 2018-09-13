@@ -1,0 +1,2 @@
+Documentation & examples for the APIProtyotype scripts can be found in the "Data Workflow" Jupyter Notebook in this folder.
+Scripts in this folder are the same as in the APIProtytype folder, they have simply been readded here so that the Notebook can use them.
