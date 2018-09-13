@@ -28,15 +28,14 @@ The Jupyter Notebooks in this folder mainly deal with visualizations of the data
 #### Python Scripts folders
 Example usage of scripts can be found in the repository's "Jupyter Notebooks" folder as a Jupyter Notebook titled "Habitat Project Script Usage".
 
------------------------------------------------------------------------------------------------------------------------------
+
 **DEPENDENCIES** Scripts written in Python 3.6.4. The Python scripts in this folder require the following packages to operate: 
 psycopg2, rasterio, pandas.
 
-**Please also note** that since the scripts are dealing with a PostgreSQL database, the connection details for this database
+**Please note** that since the scripts are dealing with a PostgreSQL database, the connection details for this database
 must be provided for the script. This can be done as follows: The folders "DataCleaner" and "layerExtractor" have a script 
 called "DBInfo.py", the connection details to the database need to be set in this scripts "connectDB()" function in both
 folders as the other scripts rely on this function for the connection to the local database.
------------------------------------------------------------------------------------------------------------------------------
 
 
 **DataCleaner** - Contains "dataCleaner.py" which is a script that contains various functions for cleaning data within a PostgreSQL database. See folder's README for further documentation on functions.
