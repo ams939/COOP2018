@@ -1,4 +1,4 @@
-# ams939's Academy of Natural Sciences of Drexel University Spring-Summer 2018 COOP code repository
+# Academy of Natural Sciences of Drexel University Spring-Summer 2018 COOP code repository
 This is a repository for three major projects I completed during my COOP period at the Academy of Natural Sciences of Drexel University in Philadelphia from April - September 2018.
 Below is a bried summary of each project, project folders also contain documentation and examples of important aspects of the projects as README files.
 The projects have also been documented with examples as Jupyter Notebooks, many of the scripts have also been throroughly commented.
